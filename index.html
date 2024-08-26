@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Express App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
+        #user-list, #user-form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            margin-bottom: 5px;
+        }
+        
+        input {
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        button {
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #218838;
+        }
+        
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to My Express App</h1>
+    <div id="user-list">
+        <h2>User List</h2>
+        <ul id="users"></ul>
+    </div>
+    <div id="user-form">
+        <h2>Add New User</h2>
+        <form id="addUserForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <button type="submit">Add User</button>
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userList = document.getElementById('users');
+            const addUserForm = document.getElementById('addUserForm');
+
+            // Fetch and display users
+            function fetchUsers() {
+                fetch('/users')
+                    .then(response => response.json())
+                    .then(users => {
+                        userList.innerHTML = '';
+                        users.forEach(user => {
+                            const li = document.createElement('li');
+                            li.textContent = `${user.name} (${user.email})`;
+                            userList.appendChild(li);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching users:', error));
+            }
+
+            fetchUsers();
+
+            // Add new user
+            addUserForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+
+                fetch('/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email })
+                })
+                    .then(response => response.json())
+                    .then(() => {
+                        fetchUsers();
+                        addUserForm.reset();
+                    })
+                    .catch(error => console.error('Error adding user:', error));
+            });
+        });
+    </script>
+</body>
+</html>
